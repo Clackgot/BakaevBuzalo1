@@ -1,28 +1,26 @@
-п»ї#include <stdio.h>
-#include <iostream>
-#include <cmath>
+#pragma once
 #include <iostream>
 #include <string>
 #include <iomanip>
 
 using namespace std;
 
-const int MAXLEN = 500; // РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° С‡РёСЃР»Р° = MAXLEN*LEN
-const int BASE = 10 * 10 * 10 * 10; // РѕСЃРЅРѕРІР°РЅРёРµ РЎРЎ, РІ РєРѕС‚РѕСЂРѕР№ С…СЂР°РЅРёС‚СЃСЏ С‡РёСЃР»Рѕ
-const int LEN = 4; // С‡РёСЃР»РѕРј РєР°РєРѕР№ СЂР°Р·СЂСЏРґРЅРѕСЃС‚Рё СЏРІР»СЏРµС‚СЃСЏ С†РёС„СЂР° (СЃС‚РµРїРµРЅСЊ base)
+const int MAXLEN = 500; // максимальная длина числа = MAXLEN*LEN
+const int BASE = 10 * 10 * 10 * 10; // основание СС, в которой хранится число
+const int LEN = 4; // числом какой разрядности является цифра (степень base)
 
 struct BigInt {
-    int amount; // РєРѕР»РёС‡РµСЃС‚РІРѕ С†РёС„СЂ РІ С‡РёСЃР»Рµ
-    int digits[MAXLEN] = { 0 }; // СЃРѕР±СЃС‚РІРµРЅРЅРѕ РјР°СЃСЃРёРІ С†РёС„СЂ С‡РёСЃР»Р°, СЃСЂР°Р·Сѓ Р·Р°РЅСѓР»СЏРµРј
-    bool isNegative; // С„Р»Р°Рі РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕСЃС‚Рё: false: С‡РёСЃР»Рѕ >= 0; true: С‡РёСЃР»Рѕ < 0
+    int amount; // количество цифр в числе
+    int digits[MAXLEN] = { 0 }; // собственно массив цифр числа, сразу зануляем
+    bool isNegative; // флаг отрицательности: false: число >= 0; true: число < 0
 
-    // РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+    // конструктор по умолчанию
     BigInt() {
         amount = 1;
         isNegative = false;
     }
 
-    // РѕСЃС‚Р°Р»СЊРЅС‹Рµ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
+    // остальные конструкторы
     BigInt(signed char c);
     BigInt(unsigned char c);
     BigInt(signed short s);
@@ -34,29 +32,29 @@ struct BigInt {
     BigInt(signed long long l);
     BigInt(unsigned long long l);
 
-    // РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё РґРµР»РµРЅРёРё РЅР° 0
+    // вызывается при делении на 0
     class DivideByZero : exception {};
 
-    // РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё РІС‹С‡РёСЃР»РµРЅРёРё РєРѕСЂРЅСЏ РёР· РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРіРѕ
+    // вызывается при вычислении корня из отрицательного
     class NegativeSqrt : exception {};
 
-    // СЃРѕР·РґР°С‘С‚ BigInt РёР· СЃС‚СЂРѕРєРё
+    // создаёт BigInt из строки
     void makeBigInt(string str);
 
-    // РІРІРѕРґ-РІС‹РІРѕРґ
+    // ввод-вывод
     void input();
     void output();
 
-    // СѓРЅР°СЂРЅС‹Р№ РјРёРЅСѓСЃ
+    // унарный минус
     const BigInt operator-() const;
 
-    // РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РґРµР»РµРЅРёСЏ
+    // вспомогательная функция для деления
     void shiftRight();
 
-    // РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ РјРёРЅСѓСЃР° Сѓ "РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРіРѕ" РЅСѓР»СЏ
+    // вспомогательная функция для удаления минуса у "отрицательного" нуля
     void checkNegativeZero();
 
-    // СЃСЂР°РІРЅРµРЅРёРµ
+    // сравнение
     friend bool operator==(const BigInt& lhs, const BigInt& rhs);
     friend bool operator!=(const BigInt& lhs, const BigInt& rhs);
     friend bool operator>(const BigInt& lhs, const BigInt& rhs);
@@ -64,82 +62,82 @@ struct BigInt {
     friend bool operator>=(const BigInt& lhs, const BigInt& rhs);
     friend bool operator<=(const BigInt& lhs, const BigInt& rhs);
 
-    // Р°СЂРёС„РјРµС‚РёРєР°
+    // арифметика
     friend BigInt operator+(const BigInt& lhs, const BigInt& rhs);
     friend BigInt operator-(const BigInt& lhs, const BigInt& rhs);
     friend BigInt operator*(const BigInt& lhs, const BigInt& rhs);
     friend BigInt operator/(const BigInt& lhs, const BigInt& rhs);
     friend BigInt operator%(const BigInt& lhs, const BigInt& rhs);
 
-    // Р°СЂРёС„РјРµС‚РёРєР° СЃ РїСЂРёСЃРІР°РёРІР°РЅРёРµРј
+    // арифметика с присваиванием
     BigInt& operator+=(const BigInt& value);
     BigInt& operator-=(const BigInt& value);
     BigInt& operator*=(const BigInt& value);
     BigInt& operator/=(const BigInt& value);
     BigInt& operator%=(const BigInt& value);
 
-    // РёРЅРєСЂРµРјРµРЅС‚ Рё РґРµРєСЂРµРјРµРЅС‚
+    // инкремент и декремент
     const BigInt operator--();
     const BigInt operator--(int);
     const BigInt operator++();
     const BigInt operator++(int);
 
-    // СЂР°Р±РѕС‚Р° СЃ РїРѕС‚РѕРєР°РјРё РІРІРѕРґР°/РІС‹РІРѕРґР°
+    // работа с потоками ввода/вывода
     friend ostream& operator<<(ostream& os, const BigInt& bigInt);
     friend istream& operator>>(istream& is, BigInt& bigInt);
 
-    // РїСЂРѕРІРµСЂРєР° С‡С‘С‚РЅРѕСЃС‚Рё/РЅРµС‡С‘С‚РЅРѕСЃС‚Рё
+    // проверка чётности/нечётности
     bool isOdd() const;
     bool isEven() const;
 
-    // РјР°С‚РµРјР°С‚РёС‡РµСЃРєРёРµ С„СѓРЅРєС†РёРё
+    // математические функции
     friend BigInt pow(BigInt a, BigInt n);
     friend BigInt fact(BigInt a);
     friend BigInt sqrt(const BigInt& a);
     friend BigInt abs(BigInt a);
 };
 
-// РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё РІ С‡РёСЃР»Рѕ
+// преобразование строки в число
 void BigInt::makeBigInt(string str) {
-    int pos = 0; // РґР»СЏ РїСЂРѕС…РѕРґР° РїРѕ РјР°СЃСЃРёРІСѓ СЃ С†РёС„СЂР°РјРё
+    int pos = 0; // для прохода по массиву с цифрами
 
-    // РїСЂРѕРІРµСЂСЏРµРј Р·РЅР°Рє, РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРѕРґРЅРёРјР°РµРј С„Р»Р°Рі Рё РѕС‚СЂРµР·Р°РµРј СЃРёРјРІРѕР» СЃРѕ Р·РЅР°РєРѕРј
+    // проверяем знак, при необходимости поднимаем флаг и отрезаем символ со знаком
     if (str[0] == '-') {
         this->isNegative = true;
         str.erase(0, 1);
     }
 
-    for (int i = str.size() - 1; i >= 0; i -= LEN) { // РЅР°С‡РёРЅР°РµРј СЃ РїРѕСЃР»РµРґРЅРµР№ С†РёС„СЂС‹ Рё РёРґС‘Рј РІ РѕР±СЂР°С‚РЅСѓСЋ СЃС‚РѕСЂРѕРЅСѓ
-        // СЃС‡РёС‚С‹РІР°РµРј РїРѕ len С†РёС„СЂ Р·Р° СЂР°Р·, С…СЂР°РЅСЏ РёС… РІ LEN-СЂР°Р·СЂСЏРґРЅС‹С… С‡РёСЃР»Р°С…
+    for (int i = str.size() - 1; i >= 0; i -= LEN) { // начинаем с последней цифры и идём в обратную сторону
+        // считываем по len цифр за раз, храня их в LEN-разрядных числах
         int start = i - LEN + 1;
 
-        // РїСЂРѕРІРµСЂРєР° РІС‹С…РѕРґР° Р·Р° РіСЂР°РЅРёС†Сѓ РјР°СЃСЃРёРІР°
+        // проверка выхода за границу массива
         if (start < 0) {
             start = 0;
         }
 
-        // РІС‹РґС‘СЂРіРёРІР°РµРј С†РёС„СЂС‹ РёР· СЃС‚СЂРѕРєРё Рё РєР»Р°РґС‘Рј РІ РјР°СЃСЃРёРІ
+        // выдёргиваем цифры из строки и кладём в массив
         string dig = str.substr(start, i - start + 1);
         digits[pos++] = atoi(dig.c_str());
     }
 
-    amount = pos; // СЃРѕС…СЂР°РЅСЏРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ С†РёС„СЂ РІ С‡РёСЃР»Рµ
+    amount = pos; // сохраняем количество цифр в числе
 
     checkNegativeZero();
 }
 
-// СЃС‡РёС‚С‹РІР°РЅРёРµ СЃС‚СЂРѕРєРё РІ BigInt
+// считывание строки в BigInt
 void BigInt::input() {
-    string str; // СЃС‚СЂРѕРєР°, РІ РєРѕС‚РѕСЂСѓСЋ СЃС‡РёС‚С‹РІР°РµС‚СЃСЏ С‡РёСЃР»Рѕ
-    cin >> str; // СЃС‡РёС‚С‹РІР°РµРј С‡РёСЃР»Рѕ РІ СЃС‚СЂРѕРєСѓ
-    makeBigInt(str); // РІС‹Р·С‹РІР°РµРј РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё РІ С‡РёСЃР»Рѕ
+    string str; // строка, в которую считывается число
+    cin >> str; // считываем число в строку
+    makeBigInt(str); // вызываем преобразование строки в число
 }
 
-// РІС‹РІРѕРґ
+// вывод
 void BigInt::output() {
-    // РїСЂРё РѕСЃРЅРѕРІР°РЅРёРё base С…СЂР°РЅРёРјР°СЏ С†РёС„СЂР° С‡РёСЃР»Р° РЅРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ base-СЂР°Р·СЂСЏРґРЅР°СЏ
-    // РїРѕСЌС‚РѕРјСѓ РµС‘ РЅСѓР¶РЅРѕ РІС‹РІРѕРґРёС‚СЊ СЃ Р»РёРґРёСЂСѓСЋС‰РёРјРё РЅСѓР»СЏРјРё, РЅРѕ РїРµСЂРІРѕР№ С†РёС„СЂС‹ СЌС‚Рѕ РЅРµ РєР°СЃР°РµС‚СЃСЏ
-    // РІС‹РІРѕРґРёРј С‚Р°РєР¶Рµ Р·РЅР°Рє РґР»СЏ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹С… С‡РёСЃРµР»
+    // при основании base хранимая цифра числа не обязательно base-разрядная
+    // поэтому её нужно выводить с лидирующими нулями, но первой цифры это не касается
+    // выводим также знак для отрицательных чисел
     if (isNegative) {
         cout << '-';
     }
@@ -151,7 +149,7 @@ void BigInt::output() {
     }
 }
 
-// СЃРјРµРЅР° Р·РЅР°РєР° С‡РёСЃР»Р°
+// смена знака числа
 const BigInt BigInt::operator-() const {
     BigInt tmp = *this;
     if (this != 0) {
@@ -160,7 +158,7 @@ const BigInt BigInt::operator-() const {
     return tmp;
 }
 
-// СЃРґРІРёРі СЂР°Р·СЂСЏРґРѕРІ РЅР° 1 РІРїСЂР°РІРѕ (СѓРјРЅРѕР¶Р°РµС‚ С‡РёСЃР»Рѕ РЅР° BASE) - РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РґРµР»РµРЅРёСЏ
+// сдвиг разрядов на 1 вправо (умножает число на BASE) - вспомогательная функция для деления
 void BigInt::shiftRight() {
     for (int i = amount; i >= 1; i--) {
         digits[i] = digits[i - 1];
@@ -171,14 +169,14 @@ void BigInt::shiftRight() {
     }
 }
 
-// РїСЂРѕРІРµСЂСЏРµС‚, СЂР°РІРЅРѕ Р»Рё С‡РёСЃР»Рѕ РЅСѓР»СЋ Рё СЃР±СЂР°СЃС‹РІР°РµС‚ Р·РЅР°Рє РІ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ
+// проверяет, равно ли число нулю и сбрасывает знак в этом случае
 void BigInt::checkNegativeZero() {
     if (this == 0) {
         this->isNegative = false;
     }
 }
 
-// РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‚РёРїРѕРІ Рє BigInt
+// преобразование типов к BigInt
 BigInt::BigInt(signed char c) {
     this->isNegative = c < 0;
 
@@ -244,7 +242,7 @@ BigInt::BigInt(unsigned long long l) {
     makeBigInt(str);
 }
 
-// РїРµСЂРµРіСЂСѓР¶Р°РµРј Р°СЂРёС„РјРµС‚РёРєСѓ
+// перегружаем арифметику
 BigInt operator+(const BigInt& lhs, const BigInt& rhs) {
     if (lhs.isNegative) {
         if (rhs.isNegative) {
@@ -260,7 +258,7 @@ BigInt operator+(const BigInt& lhs, const BigInt& rhs) {
 
     BigInt res;
     res.amount = max(lhs.amount, rhs.amount);
-    int overflow = 0; // СЃР»РµРґРёРј Р·Р° РїРµСЂРµРїРѕР»РЅРµРЅРёРµРј
+    int overflow = 0; // следим за переполнением
 
     if (lhs.isNegative && rhs.isNegative) {
         res.isNegative = true;
@@ -310,7 +308,7 @@ BigInt operator-(const BigInt& lhs, const BigInt& rhs) {
         }
     }
 
-    // СѓРґР°Р»РµРЅРёРµ Р»РёРґРёСЂСѓСЋС‰РёС… РЅСѓР»РµР№
+    // удаление лидирующих нулей
     int pos = res.amount;
 
     while (pos && !res.digits[pos]) {
@@ -339,7 +337,7 @@ BigInt operator*(const BigInt& lhs, const BigInt& rhs) {
         }
     }
 
-    // СѓРґР°Р»РµРЅРёРµ Р»РёРґРёСЂСѓСЋС‰РёС… РЅСѓР»РµР№
+    // удаление лидирующих нулей
     int pos = lhs.amount + rhs.amount;
 
     while (pos > 0 && !res.digits[pos]) {
@@ -354,12 +352,12 @@ BigInt operator*(const BigInt& lhs, const BigInt& rhs) {
 }
 
 BigInt operator/(const BigInt& lhs, const BigInt& rhs) {
-    // Р±СЂРѕСЃР°РµРј РѕС€РёР±РєСѓ РїСЂРё РґРµР»РµРЅРёРё РЅР° 0
+    // бросаем ошибку при делении на 0
     if (rhs == 0) {
         throw BigInt::DivideByZero();
     }
 
-    if (rhs.isNegative) { // РІСЃС‘ РЅРѕСЂРјР°Р»СЊРЅРѕ, СЌС‚Рѕ РєРѕСЃС‚С‹Р»СЊ
+    if (rhs.isNegative) { // всё нормально, это костыль
         return lhs / (-rhs);
     }
 
@@ -370,12 +368,12 @@ BigInt operator/(const BigInt& lhs, const BigInt& rhs) {
         res.isNegative = true;
     }
 
-    // РёРјРёС‚РёСЂСѓРµРј РґРµР»РµРЅРёРµ РІ СЃС‚РѕР»Р±РёРє, РїСЂРѕС…РѕРґСЏ РїРѕ РєР°Р¶РґРѕРјСѓ СЂР°Р·СЂСЏРґСѓ Рё РёСЃРїРѕР»СЊР·СѓСЏ Р±РёРЅР°СЂРЅС‹Р№ РїРѕРёСЃРє
+    // имитируем деление в столбик, проходя по каждому разряду и используя бинарный поиск
     for (int i = lhs.amount - 1; i >= 0; i--) {
         curValue.shiftRight();
         curValue.digits[0] = lhs.digits[i];
 
-        // РїРѕРґР±РёСЂР°РµРј С‚Р°РєРѕР№ part, С‡С‚Рѕ rhs*part <= curValue
+        // подбираем такой part, что rhs*part <= curValue
         int part = 0;
         int lBorder = 0;
         int rBorder = BASE;
@@ -397,7 +395,7 @@ BigInt operator/(const BigInt& lhs, const BigInt& rhs) {
         curValue -= rhs * part;
     }
 
-    // СѓРґР°Р»РµРЅРёРµ Р»РёРґРёСЂСѓСЋС‰РёС… РЅСѓР»РµР№
+    // удаление лидирующих нулей
     int pos = lhs.amount;
 
     while (pos >= 0 && !res.digits[pos]) {
@@ -425,7 +423,7 @@ BigInt operator%(const BigInt& lhs, const BigInt& rhs) {
     return res;
 }
 
-// Р°СЂРёС„РјРµС‚РёРєР° СЃ РїСЂРёСЃРІР°РёРІР°РЅРёРµРј
+// арифметика с присваиванием
 BigInt& BigInt::operator+=(const BigInt& value) {
     return *this = (*this + value);
 }
@@ -446,29 +444,29 @@ BigInt& BigInt::operator%=(const BigInt& value) {
     return *this = (*this % value);
 }
 
-// РїСЂРµС„РёРєСЃРЅС‹Р№ РґРµРєСЂРµРјРµРЅС‚
+// префиксный декремент
 const BigInt BigInt::operator--() {
     return *this -= 1;
 }
 
-// РїРѕСЃС‚С„РёРєСЃРЅС‹Р№ РґРµРєСЂРµРјРµРЅС‚
+// постфиксный декремент
 const BigInt BigInt::operator--(int) {
     *this -= 1;
     return *this + 1;
 }
 
-// РїСЂРµС„РёРєСЃРЅС‹Р№ РёРЅРєСЂРµРјРµРЅС‚
+// префиксный инкремент
 const BigInt BigInt::operator++() {
     return *this += 1;
 }
 
-// РїРѕСЃС‚С„РёРєСЃРЅС‹Р№ РёРЅРєСЂРµРјРµРЅС‚
+// постфиксный инкремент
 const BigInt BigInt::operator++(int) {
     *this += 1;
     return *this - 1;
 }
 
-// РїРµСЂРµРіСЂСѓР¶Р°РµРј РѕРїРµСЂР°С‚РѕСЂС‹ СЃСЂР°РІРЅРµРЅРёСЏ
+// перегружаем операторы сравнения
 bool operator==(const BigInt& lhs, const BigInt& rhs) {
     if (lhs.amount != rhs.amount) {
         return false;
@@ -557,7 +555,7 @@ bool operator<=(const BigInt& lhs, const BigInt& rhs) {
     return !(lhs > rhs);
 }
 
-// РїРµС‡Р°С‚СЊ С‡РёСЃР»Р° РІ РїРѕС‚РѕРє РІС‹РІРѕРґР°
+// печать числа в поток вывода
 ostream& operator<<(ostream& os, const BigInt& bigInt) {
     if (bigInt.isNegative) {
         os << '-';
@@ -572,39 +570,39 @@ ostream& operator<<(ostream& os, const BigInt& bigInt) {
     return os;
 }
 
-// С‡С‚РµРЅРёРµ С‡РёСЃР»Р° РІ РїРѕС‚РѕРє РІРІРѕРґР°
+// чтение числа в поток ввода
 istream& operator>>(istream& is, BigInt& bigInt) {
     string str;
     is >> str;
 
-    int pos = 0; // РґР»СЏ РїСЂРѕС…РѕРґР° РїРѕ РјР°СЃСЃРёРІСѓ СЃ С†РёС„СЂР°РјРё
+    int pos = 0; // для прохода по массиву с цифрами
 
-    // РїСЂРѕРІРµСЂСЏРµРј Р·РЅР°Рє, РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРѕРґРЅРёРјР°РµРј С„Р»Р°Рі Рё РѕС‚СЂРµР·Р°РµРј СЃРёРјРІРѕР» СЃРѕ Р·РЅР°РєРѕРј
+    // проверяем знак, при необходимости поднимаем флаг и отрезаем символ со знаком
     if (str[0] == '-') {
         bigInt.isNegative = true;
         str.erase(0, 1);
     }
 
-    for (int i = str.size() - 1; i >= 0; i -= LEN) { // РЅР°С‡РёРЅР°РµРј СЃ РїРѕСЃР»РµРґРЅРµР№ С†РёС„СЂС‹ Рё РёРґС‘Рј РІ РѕР±СЂР°С‚РЅСѓСЋ СЃС‚РѕСЂРѕРЅСѓ
-        // СЃС‡РёС‚С‹РІР°РµРј РїРѕ len С†РёС„СЂ Р·Р° СЂР°Р·, С…СЂР°РЅСЏ РёС… РІ LEN-СЂР°Р·СЂСЏРґРЅС‹С… С‡РёСЃР»Р°С…
+    for (int i = str.size() - 1; i >= 0; i -= LEN) { // начинаем с последней цифры и идём в обратную сторону
+        // считываем по len цифр за раз, храня их в LEN-разрядных числах
         int start = i - LEN + 1;
 
-        // РїСЂРѕРІРµСЂРєР° РІС‹С…РѕРґР° Р·Р° РіСЂР°РЅРёС†Сѓ РјР°СЃСЃРёРІР°
+        // проверка выхода за границу массива
         if (start < 0) {
             start = 0;
         }
 
-        // РІС‹РґС‘СЂРіРёРІР°РµРј С†РёС„СЂС‹ РёР· СЃС‚СЂРѕРєРё Рё РєР»Р°РґС‘Рј РІ РјР°СЃСЃРёРІ
+        // выдёргиваем цифры из строки и кладём в массив
         string dig = str.substr(start, i - start + 1);
         bigInt.digits[pos++] = atoi(dig.c_str());
     }
 
-    bigInt.amount = pos; // СЃРѕС…СЂР°РЅСЏРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ С†РёС„СЂ РІ С‡РёСЃР»Рµ
+    bigInt.amount = pos; // сохраняем количество цифр в числе
 
     return is;
 }
 
-// РїСЂРѕРІРµСЂРєРё РЅРµС‡С‘С‚РЅРѕСЃС‚Рё/С‡С‘С‚РЅРѕСЃС‚Рё
+// проверки нечётности/чётности
 bool BigInt::isOdd() const {
     if (this->amount == 0) {
         return false;
@@ -616,13 +614,13 @@ bool BigInt::isEven() const {
     return !this->isOdd();
 }
 
-// Р±С‹СЃС‚СЂРѕРµ (Р±РёРЅР°СЂРЅРѕРµ) РІРѕР·РІРµРґРµРЅРёРµ РІ СЃС‚РµРїРµРЅСЊ, СЂР°Р±РѕС‚Р°РµС‚ С‚РѕР»СЊРєРѕ СЃ РїРѕР»РѕР¶РёС‚РµР»СЊРЅС‹РјРё СЃС‚РµРїРµРЅСЏРјРё
+// быстрое (бинарное) возведение в степень, работает только с положительными степенями
 BigInt pow(BigInt a, BigInt n) {
     if (n.isNegative) {
         return pow(a, -n);
     }
 
-    // РґР»СЏ РІРµСЂРЅРѕРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ Р·РЅР°РєР° РїСЂРё РІРѕР·РІРµРґРµРЅРёРё РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ С‡С‘С‚РЅСѓСЋ/РЅРµС‡С‘С‚РЅСѓСЋ СЃС‚РµРїРµРЅСЊ
+    // для верного отображения знака при возведении отрицательного числа в чётную/нечётную степень
     bool minus = false;
     if (a.isNegative) {
         minus = n.isOdd();
@@ -643,7 +641,7 @@ BigInt pow(BigInt a, BigInt n) {
     return res;
 }
 
-// С„Р°РєС‚РѕСЂРёР°Р», СЂРµРєСѓСЂСЃРёРІРЅРѕ
+// факториал, рекурсивно
 BigInt fact(BigInt a) {
     if (a.isNegative) {
         return 0;
@@ -656,7 +654,7 @@ BigInt fact(BigInt a) {
     return a * fact(a - 1);
 }
 
-// РЅР°С…РѕР¶РґРµРЅРёРµ РєРѕСЂРЅСЏ (С‡РёСЃР»Рѕ, РєРІР°РґСЂР°С‚ РєРѕС‚РѕСЂРѕРіРѕ РЅРµ РїСЂРµРІРѕСЃС…РѕРґРёС‚ РґР°РЅРЅРѕРµ) Р±РёРЅР°СЂРЅС‹Рј РїРѕРґР±РѕСЂРѕРј
+// нахождение корня (число, квадрат которого не превосходит данное) бинарным подбором
 BigInt sqrt(const BigInt& a) {
     if (a.isNegative) {
         throw BigInt::NegativeSqrt();
@@ -684,43 +682,4 @@ BigInt sqrt(const BigInt& a) {
 BigInt abs(BigInt a) {
     a.isNegative = false;
     return a;
-}
-
-
-int main(){
-	setlocale(LC_ALL, "Russian");
-	cout << "Р’С‹РїРѕР»РЅРёР» СЂР°Р±РѕС‚Сѓ: Р‘Р°РєР°РµРІ РђР»РµРєСЃР°РЅРґСЂ\t\t\tР“СЂСѓРїРїР°: Р¤РРўРЈ 2-5" << endl << endl;
-	
-	
-	
-	
-	
-
-	BigInt a = 0;
-	bool founded = false;
-	cin >> a;
-	clock_t start = clock();
-	if (a % 2 == 0)
-	{
-		cout << "NO" << endl;
-	}
-	else
-	{
-		for (BigInt n = 1; n <= 111111111111111111; n = n * 10 + 1)
-		{
-			if (n % a == 0)
-			{
-				cout << n << endl;
-				founded = true;
-                break;
-			}
-		}
-		if (!founded)cout << "NO" << endl;
-	}
-	clock_t end = clock();
-	double seconds = (double)(end - start) / CLOCKS_PER_SEC;
-	printf("Р’СЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ: %f СЃРµРє.\n", seconds);
-
-	return 0;
-	
 }
